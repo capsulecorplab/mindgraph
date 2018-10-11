@@ -3,6 +3,8 @@
     > A graph data structure, for task management, in python
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.com/capsulecorplab/mindgraph.svg?branch=master)](https://travis-ci.com/capsulecorplab/mindgraph)
+[![Coverage Status](https://coveralls.io/repos/github/capsulecorplab/mindgraph/badge.svg?branch=master)](https://coveralls.io/github/capsulecorplab/mindgraph?branch=master)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 ## Usage
