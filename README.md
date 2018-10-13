@@ -1,6 +1,6 @@
 # mindgraph
 
-    > A graph data structure, for task management, in python
+> A graph data structure, for task management, in python
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.com/capsulecorplab/mindgraph.svg?branch=master)](https://travis-ci.com/capsulecorplab/mindgraph)
@@ -37,14 +37,11 @@ $ pip install git+https://github.com/capsulecorplab/mindgraph.git
 >>> thing2_2.blocking(thing2_1)
 
 >>> print(graph)
-name: learn all the things
-threads:
-- name: 1st thing
-  threads:
+learn all the things:
+- 1st thing:
   - thing within a thing
   - thing blocking a thing
-- name: 2nd thing
-  threads:
+- 2nd thing:
   - another thing within a thing
   - another thing blocking a thing
 ```

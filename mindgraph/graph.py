@@ -4,6 +4,7 @@ from yaml import dump, load
 
 class Node(object):
     """node class"""
+
     def __init__(self, name=None):
         self._dependencies = list()
         self._threads = list()
@@ -39,8 +40,8 @@ class Node(object):
         if len(self.threads) > 0:
             # print('not self')
             return "".join(["{",
-                            "'name':{}, 'threads':{}".format(self.name,
-                                                             self.threads),
+                            "{}:{}".format(self.name,
+                                           self.threads),
                             "}"])
         # print('self')
         return "{}".format(self.name)
@@ -63,6 +64,7 @@ class Node(object):
 
 class Graph(Node):
     """A Graph model of the mind"""
+
     def __init__(self, name=None):
         Node.__init__(self, name)
 

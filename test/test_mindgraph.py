@@ -75,17 +75,14 @@ def test_repr(graph):
     assert thing2.name == '2nd thing'
 
     assert str(graph) == "".join([
-                                  "name: learn all the things\n",
-                                  "threads:\n",
-                                  "- name: 1st thing\n",
-                                  "  threads:\n",
-                                  "  - thing within a thing\n",
-                                  "  - thing blocking a thing\n",
-                                  "- name: 2nd thing\n"
-                                  "  threads:\n",
-                                  "  - another thing within a thing\n",
-                                  "  - another thing blocking a thing\n",
-                                ])
+        "learn all the things:\n",
+        "- 1st thing:\n",
+        "  - thing within a thing\n",
+        "  - thing blocking a thing\n",
+        "- 2nd thing:\n"
+        "  - another thing within a thing\n",
+        "  - another thing blocking a thing\n",
+    ])
 
 
 def test_to_yaml(graph):
@@ -94,6 +91,7 @@ def test_to_yaml(graph):
     graph.to_yaml('mindgraph.yaml')
     graph2 = read_yaml('mindgraph.yaml')
     test_repr(graph2)
+    assert repr(graph) == repr(graph2)
     os.remove('mindgraph.yaml')
 
 
