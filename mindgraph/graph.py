@@ -7,10 +7,10 @@ class Node(object):
     """node class"""
 
     def __init__(self, name: str = '', weight: int = 1) -> None:
-        self._dependencies = list() # type: List[Node]
-        self._threads = list() # type: List[Node]
-        self._name = '' # type: str
-        self._weight = weight # type: int
+        self._dependencies = list()  # type: List[Node]
+        self._threads = list()  # type: List[Node]
+        self._name = ''  # type: str
+        self._weight = weight  # type: int
         if type(name) is str:
             self._name = name
         else:
