@@ -38,6 +38,11 @@ def test_node_pop(graph):
         assert "" in str(info.value)
 
 
+def test_node_pop_fail1(graph):
+    with pytest.raises(IndexError):
+        graph.pop(20000)
+
+
 def test_node_append_TypeError():
     with pytest.raises(TypeError) as info:
         node = Node('mynode')

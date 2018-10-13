@@ -27,12 +27,7 @@ class Node(object):
 
     def pop(self, index: int) -> "Node":
         """ Pops the Node from threads[index] """
-        threads_length = len(self._threads)
-        indexIsGood = index < threads_length or index >= 0
-        if indexIsGood:
-            return self._threads.pop(index)
-        else:
-            raise TypeError
+        return self._threads.pop(index)
 
     def blockedby(self, node: "Node") -> None:
         """ Adds a Node to the dependenceis list """
