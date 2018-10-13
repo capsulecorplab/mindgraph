@@ -30,9 +30,9 @@ def test_node_append(graph):
     assert thing3.name == '3rd thing'
 
 
-def test_node_remove(graph):
+def test_node_pop(graph):
     assert graph[2].name == '3rd thing'
-    graph.remove(2)
+    graph.pop(2)
     with pytest.raises(IndexError) as info:
         thing3 = graph[2]
         assert "" in str(info.value)
