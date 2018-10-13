@@ -5,10 +5,11 @@ from yaml import dump, load
 class Node(object):
     """node class"""
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, weight=1):
         self._dependencies = list()
         self._threads = list()
         self._name = ''
+        self._weight = weight
         if type(name) is str:
             self._name = name
         else:
@@ -60,6 +61,14 @@ class Node(object):
     @property
     def threads(self):
         return self._threads
+
+    @property
+    def weight(self):
+        return self._weight
+
+    @weight.setter
+    def weight(self, value):
+        self._weight = value
 
 
 class Graph(Node):

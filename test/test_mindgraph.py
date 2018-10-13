@@ -85,6 +85,15 @@ def test_repr(graph):
     ])
 
 
+def test_weight_getter_setter():
+    node = Node('myNode')
+    default_weight = node.weight
+    node.weight = 5
+
+    assert default_weight == 1
+    assert node.weight == 5
+
+
 def test_to_yaml(graph):
     assert graph.name == 'learn all the things'
     assert graph[0].name == '1st thing'
