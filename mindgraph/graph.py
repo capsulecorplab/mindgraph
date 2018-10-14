@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import List, Any
 from yaml import dump, load
+from bisect import bisect_left
+
+
+
 
 
 class Node(object):
@@ -25,8 +29,22 @@ class Node(object):
         else:
             raise TypeError
 
-    def pop(self, index: int) -> "Node":
+    def _linear_search(self, name: str) -> int:
+        """ find a node index by name in self._threads """
+        for i, node in enumerate(self._threads):
+            if node.name == name:
+                return i
+        return -1
+
+    def pop(self, item = None) -> "Node":
         """ Pops the Node from threads[index] """
+        if type(item) == int:
+            return self._threads.pop(item)
+        if item == None:
+            return self._threads.pop()
+        index = self._linear_search(item)
+        if index == -1:
+            raise NameError
         return self._threads.pop(index)
 
     def blockedby(self, node: "Node") -> None:
@@ -60,6 +78,9 @@ class Node(object):
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
+
+    def __len__(self) -> int:
+        return len(self._threads)
 
     @property
     def dependencies(self) -> List["Node"]:

@@ -41,6 +41,7 @@ def test_node_pop(graph):
         assert "" in str(info.value)
 
 
+
 def test_node_pop_fail1(graph):
     with pytest.raises(IndexError):
         graph.pop(20000)
@@ -133,6 +134,18 @@ def test_to_yaml_TypeError():
         read_yaml('not_a_graph.yaml')
         assert "" in str(info.value)
     os.remove('not_a_graph.yaml')
+
+
+def test_node_pop_by_name(graph):
+    graph.append('thingy')
+    graph.pop('thingy')
+
+    assert len(graph.threads) == 3
+
+
+def test_node_pop_by_name_fail(graph):
+    with pytest.raises(NameError):
+        graph.pop('thingy')
 
 
 if __name__ == '__main__':
