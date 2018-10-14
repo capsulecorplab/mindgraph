@@ -20,21 +20,24 @@ def test_node_append(graph):
     thing1 = graph.append('1st thing')
     thing2 = graph.append('2nd thing')
     thing3 = graph.append('3rd thing')
+    thing4 = graph.append('4th thing')
 
     assert thing1 is graph[0]
     assert thing2 is graph[1]
     assert thing3 is graph[2]
+    assert thing4 is graph[3]
 
     assert thing1.name == '1st thing'
     assert thing2.name == '2nd thing'
     assert thing3.name == '3rd thing'
+    assert thing4.name == '4th thing'
 
 
 def test_node_pop(graph):
-    assert graph[2].name == '3rd thing'
+    assert graph[3].name == '4th thing'
     graph.pop(2)
     with pytest.raises(IndexError) as info:
-        thing3 = graph[2]
+        thing3 = graph[3]
         assert "" in str(info.value)
 
 
@@ -58,12 +61,24 @@ def test_blockedby(graph):
     assert thing1_1.dependencies[0].name == 'thing blocking a thing'
 
 
+def test_blockedby_fail_by_type(graph):
+    thing3 = graph[0]
+    with pytest.raises(TypeError):
+        thing3.blockedby(123)
+
+
 def test_blocking(graph):
     thing2 = graph[1]
     thing2_1 = thing2.append('another thing within a thing')
     thing2_2 = thing2.append('another thing blocking a thing')
     thing2_2.blocking(thing2_1)
     assert thing2_1.dependencies[0].name == 'another thing blocking a thing'
+
+
+def test_blockeding_fail_by_type(graph):
+    thing3 = graph[0]
+    with pytest.raises(TypeError):
+        thing3.blocking(123)
 
 
 def test_repr(graph):
@@ -73,7 +88,7 @@ def test_repr(graph):
     thing2 = graph[1]
 
     with pytest.raises(IndexError) as info:
-        thing3 = graph[2]
+        thing4 = graph[10]
         assert "" in str(info.value)
 
     assert thing1.name == '1st thing'
@@ -87,6 +102,7 @@ def test_repr(graph):
         "- 2nd thing:\n"
         "  - another thing within a thing\n",
         "  - another thing blocking a thing\n",
+        "- 4th thing\n"
     ])
 
 
