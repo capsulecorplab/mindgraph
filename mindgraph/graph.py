@@ -16,14 +16,14 @@ class Node(object):
         else:
             raise TypeError
 
-    def append(self, nodeName: str) -> "Node":
+    def append(self, newnode) -> "Node":
         """ Creates a new Node and appends it to threads """
-        if type(nodeName) is str:
-            node = Node(nodeName)
-            self._threads.append(node)
-            return node
-        else:
+        if type(newnode) is str:
+            newnode = Node(newnode)
+        elif type(newnode) is not Node:
             raise TypeError
+        self._threads.append(newnode)
+        return newnode
 
     def pop(self, index: int) -> "Node":
         """ Pops the Node from threads[index] """
