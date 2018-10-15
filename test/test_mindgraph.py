@@ -107,6 +107,15 @@ def test_weight_getter_setter():
     assert node.weight == 5
 
 
+def test_name_getter_setter():
+    node = Node()
+    default_name = node.name
+    node.name = 'a new name'
+
+    assert default_name == ''
+    assert node.name == 'a new name'
+
+
 def test_to_yaml(graph):
     assert graph.name == 'learn all the things'
     assert graph[0].name == '1st thing'
