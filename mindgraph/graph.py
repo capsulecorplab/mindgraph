@@ -71,6 +71,11 @@ class Node(object):
         """ name getter """
         return self._name
 
+    @name.setter
+    def name(self, name: str) -> None:
+        """ name setter """
+        self._name = name
+
     @property
     def threads(self) -> List["Node"]:
         """ threads getter """
