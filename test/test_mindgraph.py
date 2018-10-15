@@ -16,6 +16,14 @@ def test_node_init_typeerror():
         assert "" in str(info.value)
 
 
+def test_node_append_node():
+    rootNode = Node('root node')
+    subNode1 = rootNode.append(Node('sub node'))
+    subNode2 = rootNode.append(Node('sub node 2'))
+    assert rootNode[0] is subNode1
+    assert rootNode[1] is subNode2
+
+
 def test_node_append(graph):
     thing1 = graph.append('1st thing')
     thing2 = graph.append('2nd thing')
