@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import functools
+
 from typing import List
 from yaml import dump, load
 
@@ -49,14 +51,24 @@ class Node(object):
         return self._threads[key]
 
     def __repr__(self) -> str:
-        if len(self.threads) > 0:
-            # print('not self')
-            return "".join(["{",
-                            "{}:{}".format(self.name,
-                                           self.threads),
-                            "}"])
-        # print('self')
-        return "{}".format(self.name)
+        return self.custom_repr(self, 0)
+
+    @staticmethod
+    def custom_repr(node: "Node", deep: int =0) -> str:
+
+        if len(node.threads) > 0:
+
+            if deep == 0:
+                return node.name + ":\n" + '\n'.join(
+                    map(functools.partial(node.custom_repr, deep=deep+1), node.threads))
+            elif deep == 1:
+                return '- ' + node.name + ":\n" + '\n'.join(
+                    map(functools.partial(node.custom_repr, deep=deep + 1), node.threads))
+            else:
+                return "    "*(deep-1) + "- {}".format(node.name) + ":\n" + '\n'.join(
+                    map(functools.partial(node.custom_repr, deep=deep + 1), node.threads))
+
+        return "    "*(deep-1) + "- {}".format(node.name)
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
