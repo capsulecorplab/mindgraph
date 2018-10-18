@@ -117,6 +117,8 @@ def test_deep_repr(graph):
     ])
 
     thing2_1.pop(0)
+
+
 def test_weight_getter_setter():
     node = Node('myNode')
     default_weight = node.weight
