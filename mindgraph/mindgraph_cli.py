@@ -2,18 +2,20 @@ from mindgraph.graph import read_yaml
 from yaml import load
 from yaml.scanner import ScannerError
 import argparse
+import sys
 
 
-def arg_parser():
+
+def arg_parser(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--yaml-file", dest="files", nargs="+",
                         help="one or more yaml files separated by comma",
                         required=True)
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def main():
-    args = arg_parser()
+    args = arg_parser(sys.argv[1:])
     file_list = args.files
     print("Reading the following files:")
     print(", ".join(file_list))
