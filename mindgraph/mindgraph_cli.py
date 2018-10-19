@@ -6,7 +6,7 @@ import argparse
 
 def arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--yaml-file", dest="files",
+    parser.add_argument("-f", "--yaml-file", dest="files", nargs="+",
                         help="one or more yaml files separated by comma",
                         required=True)
     return parser.parse_args()
@@ -14,7 +14,7 @@ def arg_parser():
 
 def main():
     args = arg_parser()
-    file_list = args.files.split(",")
+    file_list = args.files
     print("Reading the following files:")
     print(", ".join(file_list))
     for file in file_list:
