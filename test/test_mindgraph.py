@@ -98,6 +98,27 @@ def test_repr(graph):
     ])
 
 
+def test_deep_repr(graph):
+
+    thing2_1 = graph[1][0]
+    assert thing2_1.name == 'another thing within a thing'
+
+    thing2_1.append('super deep thing')
+
+    assert str(graph) == "".join([
+        "learn all the things:\n",
+        "- 1st thing:\n",
+        "  - thing within a thing\n",
+        "  - thing blocking a thing\n",
+        "- 2nd thing:\n"
+        "  - another thing within a thing:\n",
+        "    - super deep thing\n"
+        "  - another thing blocking a thing\n",
+    ])
+
+    thing2_1.pop(0)
+
+
 def test_weight_getter_setter():
     node = Node('myNode')
     default_weight = node.weight
