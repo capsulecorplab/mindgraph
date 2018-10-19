@@ -17,7 +17,7 @@ setup(
     install_requires=['pyyaml'],
     test_require=['os', 'pytest', 'pyyaml'],
     entry_points={
-            'console_scripts': [
+        'console_scripts': [
             'mindgraphcli=mindgraph.mindgraph_cli:main',
         ]
     }
