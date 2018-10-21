@@ -57,12 +57,13 @@ class Node(object):
         indent = "    " * depth
         bullet = "- " if depth != 0 else ""
 
-        line = '{indent}{bullet}{node.name}'.format(**locals())
+        lines = ['{indent}{bullet}{node.name}'.format(**locals())]
         if len(node.threads) > 0:
-            line += ":"
+            lines[0] += ":"
 
         children = [node.custom_repr(n, depth+1) for n in node.threads]
-        return '\n'.join((line, *children))
+        lines.extend(children)
+        return '\n'.join(lines)
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
