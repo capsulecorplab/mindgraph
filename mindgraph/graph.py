@@ -6,10 +6,6 @@ from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
 from yaml import dump, load
 
 
-def identity(x):
-    return x
-
-
 class Node(object):
     """node class"""
 
@@ -82,13 +78,17 @@ class Node(object):
     def _postorder(self,
                    depth: int = 0,
                    visited: Set["Node"] = None,
-                   node_key: Callable[["Node"], Any]=identity,
+                   node_key: Callable[["Node"], Any]=None,
                    ) -> Generator[Tuple[int, "Node"], None, Set["Node"]]:
         """Post-order traversal of graph rooted at node"""
         if visited is None:
             visited = set()
 
-        for child in sorted(self._threads, key=node_key):
+        children = self._threads
+        if node_key is not None:
+            children = sorted(self._threads, key=node_key)
+
+        for child in children:
             if child not in visited:
                 visited = yield from child._postorder(depth+1,
                                                       visited,

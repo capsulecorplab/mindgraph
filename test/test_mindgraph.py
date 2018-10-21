@@ -1,7 +1,9 @@
-from mindgraph import *
+import os
+
 import pytest
 import yaml
-import os
+
+from mindgraph import *
 
 
 @pytest.fixture(scope="module")
@@ -52,6 +54,12 @@ def test_todo_blocking_tasks_win(task_graph):
     assert todo.index('task 2.2') < todo.index('task 3.2')
     assert todo.index('task 2.2') < todo.index('task 1.2')
     assert todo.index('task 1.1') < todo.index('task 1.2')
+
+
+def test_postorder_default_weights_ignored(task_graph):
+    """Post-order traversal ignores node weights by default"""
+    po = [n.name for _, n in task_graph._postorder()]
+    assert po.index('task 1.1') < po.index('task 1.3')
 
 
 def test_node_init_typeerror():
