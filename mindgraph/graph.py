@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import Iterator, List
 
 from yaml import dump, load
 
@@ -50,20 +50,21 @@ class Node(object):
         return self._threads[key]
 
     def __repr__(self) -> str:
-        return self.custom_repr(self, depth=0)
+        return '\n'.join(self.format_tree())
 
-    @staticmethod
-    def custom_repr(node: "Node", depth: int = 0) -> str:
-        indent = "    " * depth
-        bullet = "- " if depth != 0 else ""
+    def format_tree(self: "Node", depth: int = 0) -> Iterator[str]:
+        """Format node and dependents in tree format, emitting lines
 
-        lines = ['{indent}{bullet}{node.name}'.format(**locals())]
-        if len(node.threads) > 0:
-            lines[0] += ":"
+        Assumes no cycles in graph
+        """
+        indent = '    ' * depth
+        bullet = '- ' if depth != 0 else ''
+        suffix = ':' if self.threads else ''
+        line = '{indent}{bullet}{self.name}{suffix}'.format(**locals())
 
-        children = [node.custom_repr(n, depth+1) for n in node.threads]
-        lines.extend(children)
-        return '\n'.join(lines)
+        yield line
+        for n in self.threads:
+            yield from n.format_tree(depth+1)
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
