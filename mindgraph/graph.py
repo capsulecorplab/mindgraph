@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import functools
+from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
+                    Tuple)
 
-from typing import List
 from yaml import dump, load
 
 
@@ -72,6 +73,38 @@ class Node(object):
                                          functools.partial(node.custom_repr,
                                                            depth=depth + 1),
                                          node.threads))
+
+    def _postorder(self,
+                   depth: int = 0,
+                   visited: Set["Node"] = None,
+                   node_key: Callable[["Node"], Any] = lambda x: x,
+                   ) -> Generator[Tuple[int, "Node"], None, Set["Node"]]:
+        """Post-order traversal of graph rooted at node"""
+        from operator import attrgetter
+
+        if visited is None:
+            visited = set()
+
+        for child in sorted(self._threads, key=node_key):
+            if child not in visited:
+                visited = yield from child._postorder(depth+1, visited, node_key)
+
+        yield (depth, self)
+        visited.add(self)
+
+        return visited
+
+
+    def todo(self) -> Iterator["Node"]:
+        """Generate nodes in todo order
+
+        Nodes are scheduled by weight and to resolve blocking tasks
+        """
+        # sorts by weight (2 before 1), then alphabetical
+        node_key = lambda x: (-x.weight, x.name)
+        return (x[1] for x in self._postorder(node_key=node_key))
+
+
 
         return "    " * (depth - 1) + "- {}".format(node.name)
 

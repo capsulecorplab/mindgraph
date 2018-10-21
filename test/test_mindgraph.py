@@ -10,6 +10,50 @@ def graph():
     return graph
 
 
+@pytest.fixture
+def task_graph():
+    # setup example graph from issue #14
+    g = Graph('build a thing')
+
+    t1 = g.append('task 1')
+    t1.weight = 3
+    t11 = t1.append('task 1.1')
+    t12 = t1.append('task 1.2')
+    t13 = t1.append('task 1.3')
+    t13.weight = 3
+
+    t2 = g.append('task 2')
+    t2.weight = 2
+    t21 = t2.append('task 2.1')
+    t22 = t2.append('task 2.2')
+    t221 = t22.append('task 2.2.1')
+    t222 = t22.append('task 2.2.2')
+
+    t3 = g.append('task 3')
+    t31 = t3.append('task 3.1')
+    t32 = t3.append('task 3.2')
+
+    t32.threads.append(t22)
+    t12.threads.append(t22)
+    return g
+
+
+def test_todo_high_weights_win(task_graph):
+    """High weights are scheduled before low weights"""
+    todo = [n.name for n in task_graph.todo()]
+    assert todo.index('task 1') < todo.index('task 2')
+    assert todo.index('task 1') < todo.index('task 3')
+    assert todo.index('task 1.3') < todo.index('task 1.1')
+
+
+def test_todo_blocking_tasks_win(task_graph):
+    """Blocking tasks are scheduled before blocked tasks"""
+    todo = [n.name for n in task_graph.todo()]
+    assert todo.index('task 2.2') < todo.index('task 3.2')
+    assert todo.index('task 2.2') < todo.index('task 1.2')
+    assert todo.index('task 1.1') < todo.index('task 1.2')
+
+
 def test_node_init_typeerror():
     with pytest.raises(TypeError) as info:
         node = Node(47)
