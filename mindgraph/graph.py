@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-import functools
-from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
-                    Tuple)
-
+from typing import Iterator, List
 from yaml import dump, load
 
 
@@ -52,28 +49,22 @@ class Node(object):
         return self._threads[key]
 
     def __repr__(self) -> str:
-        return self.custom_repr(self, 0)
+        return '\n'.join(self.format_tree())
 
-    @staticmethod
-    def custom_repr(node: "Node", depth: int = 0) -> str:
+    def format_tree(self: "Node", depth: int = 0) -> Iterator[str]:
+        """Format node and dependents in tree format, emitting lines
 
-        if len(node.threads) > 0:
+        Assumes no cycles in graph
+        """
+        indent = '    ' * depth
+        bullet = '- ' if depth != 0 else ''
+        suffix = ':' if self.threads else ''
+        line = '{indent}{bullet}{self.name}{suffix}'.format(**locals())
 
-            if depth == 0:
-                return node.name + ":\n" + '\n'.join(
-                    map(functools.partial(node.custom_repr, depth=depth + 1),
-                        node.threads))
-            elif depth == 1:
-                return '- ' + node.name + ":\n" + '\n'.join(
-                    map(functools.partial(node.custom_repr, depth=depth + 1),
-                        node.threads))
-            else:
-                return "    " * (depth - 1) + "- {}".format(node.name) + \
-                       ":\n" + '\n'.join(map(
-                                         functools.partial(node.custom_repr,
-                                                           depth=depth + 1),
-                                         node.threads))
-        return "    " * (depth - 1) + "- {}".format(node.name)
+        yield line
+        for n in self.threads:
+            yield from n.format_tree(depth+1)
+
 
     def _postorder(self,
                    depth: int = 0,
