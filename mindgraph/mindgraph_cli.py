@@ -5,7 +5,6 @@ import argparse
 import sys
 
 
-
 def arg_parser(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--yaml-file", dest="files", nargs="+",
