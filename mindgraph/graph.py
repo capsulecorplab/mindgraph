@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from typing import Iterator, List
+from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
+                    Tuple)
 from yaml import dump, load
 
 
@@ -64,7 +65,6 @@ class Node(object):
         yield line
         for n in self.threads:
             yield from n.format_tree(depth+1)
-
 
     def _postorder(self,
                    depth: int = 0,
