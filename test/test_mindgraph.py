@@ -1,13 +1,65 @@
-from mindgraph import *
+import os
+
 import pytest
 import yaml
-import os
+
+from mindgraph import *
 
 
 @pytest.fixture(scope="module")
 def graph():
     graph = Graph('learn all the things')
     return graph
+
+
+@pytest.fixture
+def task_graph():
+    # setup example graph from issue #14
+    g = Graph('build a thing')
+
+    t1 = g.append('task 1')
+    t1.weight = 3
+    t11 = t1.append('task 1.1')
+    t12 = t1.append('task 1.2')
+    t13 = t1.append('task 1.3')
+    t13.weight = 3
+
+    t2 = g.append('task 2')
+    t2.weight = 2
+    t21 = t2.append('task 2.1')
+    t22 = t2.append('task 2.2')
+    t221 = t22.append('task 2.2.1')
+    t222 = t22.append('task 2.2.2')
+
+    t3 = g.append('task 3')
+    t31 = t3.append('task 3.1')
+    t32 = t3.append('task 3.2')
+
+    t32.threads.append(t22)
+    t12.threads.append(t22)
+    return g
+
+
+def test_todo_high_weights_win(task_graph):
+    """High weights are scheduled before low weights"""
+    todo = [n.name for n in task_graph.todo()]
+    assert todo.index('task 1') < todo.index('task 2')
+    assert todo.index('task 1') < todo.index('task 3')
+    assert todo.index('task 1.3') < todo.index('task 1.1')
+
+
+def test_todo_blocking_tasks_win(task_graph):
+    """Blocking tasks are scheduled before blocked tasks"""
+    todo = [n.name for n in task_graph.todo()]
+    assert todo.index('task 2.2') < todo.index('task 3.2')
+    assert todo.index('task 2.2') < todo.index('task 1.2')
+    assert todo.index('task 1.1') < todo.index('task 1.2')
+
+
+def test_postorder_default_weights_ignored(task_graph):
+    """Post-order traversal ignores node weights by default"""
+    po = [n.name for _, n in task_graph._postorder()]
+    assert po.index('task 1.1') < po.index('task 1.3')
 
 
 def test_node_init_typeerror():
@@ -96,6 +148,27 @@ def test_repr(graph):
         "  - another thing within a thing\n",
         "  - another thing blocking a thing\n",
     ])
+
+
+def test_deep_repr(graph):
+
+    thing2_1 = graph[1][0]
+    assert thing2_1.name == 'another thing within a thing'
+
+    thing2_1.append('super deep thing')
+
+    assert str(graph) == "".join([
+        "learn all the things:\n",
+        "- 1st thing:\n",
+        "  - thing within a thing\n",
+        "  - thing blocking a thing\n",
+        "- 2nd thing:\n"
+        "  - another thing within a thing:\n",
+        "    - super deep thing\n"
+        "  - another thing blocking a thing\n",
+    ])
+
+    thing2_1.pop(0)
 
 
 def test_weight_getter_setter():
