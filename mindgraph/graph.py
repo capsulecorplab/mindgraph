@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from typing import List, Any
+from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
+                    Tuple)
 from yaml import dump, load
 from bisect import bisect_left
 
@@ -20,14 +21,14 @@ class Node(object):
         else:
             raise TypeError
 
-    def append(self, nodeName: str) -> "Node":
+    def append(self, newnode) -> "Node":
         """ Creates a new Node and appends it to threads """
-        if type(nodeName) is str:
-            node = Node(nodeName)
-            self._threads.append(node)
-            return node
-        else:
+        if type(newnode) is str:
+            newnode = Node(newnode)
+        elif type(newnode) is not Node:
             raise TypeError
+        self._threads.append(newnode)
+        return newnode
 
     def _linear_search(self, name: str) -> int:
         """ find a node index by name in self._threads """
@@ -67,14 +68,55 @@ class Node(object):
         return self._threads[key]
 
     def __repr__(self) -> str:
-        if len(self.threads) > 0:
-            # print('not self')
-            return "".join(["{",
-                            "{}:{}".format(self.name,
-                                           self.threads),
-                            "}"])
-        # print('self')
-        return "{}".format(self.name)
+        return '\n'.join(self.format_tree())
+
+    def format_tree(self: "Node", depth: int = 0) -> Iterator[str]:
+        """Format node and dependents in tree format, emitting lines
+
+        Assumes no cycles in graph
+        """
+        indent = '    ' * depth
+        bullet = '- ' if depth != 0 else ''
+        suffix = ':' if self.threads else ''
+        line = '{indent}{bullet}{self.name}{suffix}'.format(**locals())
+
+        yield line
+        for n in self.threads:
+            yield from n.format_tree(depth+1)
+
+    def _postorder(self,
+                   depth: int = 0,
+                   visited: Set["Node"] = None,
+                   node_key: Callable[["Node"], Any]=None,
+                   ) -> Generator[Tuple[int, "Node"], None, Set["Node"]]:
+        """Post-order traversal of graph rooted at node"""
+        if visited is None:
+            visited = set()
+
+        children = self._threads
+        if node_key is not None:
+            children = sorted(self._threads, key=node_key)
+
+        for child in children:
+            if child not in visited:
+                visited = yield from child._postorder(depth+1,
+                                                      visited,
+                                                      node_key)
+
+        yield (depth, self)
+        visited.add(self)
+
+        return visited
+
+    def todo(self) -> Iterator["Node"]:
+        """Generate nodes in todo order
+
+        Nodes are scheduled by weight and to resolve blocking tasks
+        """
+        # sorts by weight (2 before 1), then alphabetical
+        def node_key(node):
+            return (-node.weight, node.name)
+        return (x[1] for x in self._postorder(node_key=node_key))
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
@@ -91,6 +133,11 @@ class Node(object):
     def name(self) -> str:
         """ name getter """
         return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        """ name setter """
+        self._name = name
 
     @property
     def threads(self) -> List["Node"]:
