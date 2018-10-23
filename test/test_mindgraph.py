@@ -219,7 +219,8 @@ def test_parser():
     assert parser.files == file_list
 
 
-@patch("builtins.open", new_callable=mock_open, read_data="learn all the things")
+@patch("builtins.open", new_callable=mock_open,
+       read_data="learn all the things")
 @patch("mindgraph.mindgraph_cli.arg_parser")
 @patch("mindgraph.mindgraph_cli.read_yaml")
 def test_main(mock_read_yaml, mock_arg_parse, mock_file):
@@ -232,7 +233,8 @@ def test_main(mock_read_yaml, mock_arg_parse, mock_file):
         mock_read_yaml.assert_any_call(file)
         assert open(file).read() == "learn all the things"
 
-    mock_open(mock_file, read_data="Not Yaml format\n\t\t{learn all the things}")
+    mock_open(mock_file,
+              read_data="Not Yaml format\n\t\t{learn all the things}")
     mock_read_yaml.reset_mock()
     main()
     mock_read_yaml.assert_not_called()
