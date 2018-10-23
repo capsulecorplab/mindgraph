@@ -1,5 +1,5 @@
 import os
-from random import choices
+from random import choice
 import string
 from argparse import Namespace
 
@@ -214,7 +214,7 @@ def test_to_yaml_TypeError():
 
 
 def test_parser():
-    file_list = (choices(string.ascii_letters, k=5))
+    file_list = [choice(string.ascii_letters) for _ in range(5)]
     parser = arg_parser(["-f"]+file_list)
     assert parser.files == file_list
 
@@ -224,7 +224,7 @@ def test_parser():
 @patch("mindgraph.mindgraph_cli.arg_parser")
 @patch("mindgraph.mindgraph_cli.read_yaml")
 def test_main(mock_read_yaml, mock_arg_parse, mock_file):
-    file_list = (choices(string.ascii_letters, k=5))
+    file_list = [choice(string.ascii_letters) for _ in range(5)]
     mock_arg_parse.return_value = Namespace(files=file_list)
     mock_read_yaml.return_value = "read yaml file"
     main()
