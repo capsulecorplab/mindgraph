@@ -139,9 +139,10 @@ class Task(object):
             f.write(dump(self))
 
 
-def project(name: str=None) -> Task:
+class Project(object):
     """Returns a task representing the root of your project"""
-    return Task(name)
+    def __new__(cls, name: str=None) -> Task:
+        return Task(name)
 
 
 def read_yaml(filename: str = "") -> Task:

@@ -12,14 +12,14 @@ from mindgraph import *
 
 @pytest.fixture(scope="module")
 def graph():
-    graph = project('learn all the things')
+    graph = Project('learn all the things')
     return graph
 
 
 @pytest.fixture
 def task_graph():
     # setup example graph from issue #14
-    g = project('build a thing')
+    g = Project('build a thing')
 
     t1 = g.append('task 1')
     t1.priority = 3
@@ -61,26 +61,26 @@ def test_todo_blocking_tasks_win(task_graph):
 
 
 def test_postorder_default_prioritys_ignored(task_graph):
-    """Post-order traversal ignores node prioritys by default"""
+    """Post-order traversal ignores task prioritys by default"""
     po = [n.name for _, n in task_graph._postorder()]
     assert po.index('task 1.1') < po.index('task 1.3')
 
 
-def test_node_init_typeerror():
+def test_task_init_typeerror():
     with pytest.raises(TypeError) as info:
-        node = Task(47)
+        task = Task(47)
         assert "" in str(info.value)
 
 
-def test_node_append_node():
-    rootTask = Task('root node')
-    subTask1 = rootTask.append(Task('sub node'))
-    subTask2 = rootTask.append(Task('sub node 2'))
+def test_task_append_task():
+    rootTask = Task('root task')
+    subTask1 = rootTask.append(Task('sub task'))
+    subTask2 = rootTask.append(Task('sub task 2'))
     assert rootTask[0] is subTask1
     assert rootTask[1] is subTask2
 
 
-def test_node_append(graph):
+def test_task_append(graph):
     thing1 = graph.append('1st thing')
     thing2 = graph.append('2nd thing')
     thing3 = graph.append('3rd thing')
@@ -94,7 +94,7 @@ def test_node_append(graph):
     assert thing3.name == '3rd thing'
 
 
-def test_node_pop(graph):
+def test_task_pop(graph):
     assert graph[2].name == '3rd thing'
     graph.pop(2)
     with pytest.raises(IndexError) as info:
@@ -102,15 +102,15 @@ def test_node_pop(graph):
         assert "" in str(info.value)
 
 
-def test_node_pop_fail1(graph):
+def test_task_pop_fail1(graph):
     with pytest.raises(IndexError):
         graph.pop(20000)
 
 
-def test_node_append_TypeError():
+def test_task_append_TypeError():
     with pytest.raises(TypeError) as info:
-        node = Task('mynode')
-        node.append(47)
+        task = Task('mytask')
+        task.append(47)
         assert "" in str(info.value)
 
 
@@ -176,21 +176,21 @@ def test_deep_repr(graph):
 
 
 def test_priority_getter_setter():
-    node = Task('myTask')
-    default_priority = node.priority
-    node.priority = 5
+    task = Task('myTask')
+    default_priority = task.priority
+    task.priority = 5
 
     assert default_priority == 1
-    assert node.priority == 5
+    assert task.priority == 5
 
 
 def test_name_getter_setter():
-    node = Task()
-    default_name = node.name
-    node.name = 'a new name'
+    task = Task()
+    default_name = task.name
+    task.name = 'a new name'
 
     assert default_name == ''
-    assert node.name == 'a new name'
+    assert task.name == 'a new name'
 
 
 def test_to_yaml(graph):
