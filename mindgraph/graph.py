@@ -139,18 +139,16 @@ class Task(object):
             f.write(dump(self))
 
 
-class Project(Task):
+def project(name: str=None) -> Task:
     """Returns a task representing the root of your project"""
-
-    def __init__(self, name=None) -> None:
-        Task.__init__(self, name)
+    return Task(name)
 
 
-def read_yaml(filename: str = "") -> Project:
-    """ Load a Project from a yaml file """
+def read_yaml(filename: str = "") -> Task:
+    """ Load a project from a yaml file """
     with open(filename, 'r') as f:
         rv = load(f.read())
-        if type(rv) is Project:
+        if type(rv) is Task:
             return rv
         else:
             raise TypeError(type(rv))
