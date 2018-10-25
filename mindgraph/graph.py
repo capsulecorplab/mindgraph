@@ -17,14 +17,14 @@ class Task(object):
         else:
             raise TypeError
 
-    def append(self, newTask) -> "Task":
+    def append(self, newtask) -> "Task":
         """ Creates a new Task and appends it to subtasks """
-        if type(newTask) is str:
-            newTask = Task(newTask)
-        elif type(newTask) is not Task:
+        if type(newtask) is str:
+            newtask = Task(newtask)
+        elif type(newtask) is not Task:
             raise TypeError
-        self._subtasks.append(newTask)
-        return newTask
+        self._subtasks.append(newtask)
+        return newtask
 
     def pop(self, index: int) -> "Task":
         """ Pops the Task from subtasks[index] """
