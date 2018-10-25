@@ -122,12 +122,24 @@ def test_blockedby(project):
     assert thing1_1.blockers[0].name == 'thing blocking a thing'
 
 
+def test_blockedby_TypeError():
+    with pytest.raises(TypeError):
+        task = Task('mytask')
+        task.blockedby(47)
+
+
 def test_blocking(project):
     thing2 = project[1]
     thing2_1 = thing2.append('another thing within a thing')
     thing2_2 = thing2.append('another thing blocking a thing')
     thing2_2.blocking(thing2_1)
     assert thing2_1.blockers[0].name == 'another thing blocking a thing'
+
+
+def test_blocking_TypeError():
+    with pytest.raises(TypeError):
+        task = Task('mytask')
+        task.blocking(47)
 
 
 def test_repr(project):
