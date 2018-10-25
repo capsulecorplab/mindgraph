@@ -11,14 +11,14 @@ from mindgraph import *
 
 
 @pytest.fixture(scope="module")
-def graph():
-    graph = Project('learn all the things')
-    return graph
+def project():
+    project = Project('learn all the things')
+    return project
 
 
 @pytest.fixture
-def task_graph():
-    # setup example graph from issue #14
+def task_project():
+    # setup example project from issue #14
     g = Project('build a thing')
 
     t1 = g.append('task 1')
@@ -44,25 +44,25 @@ def task_graph():
     return g
 
 
-def test_todo_high_prioritys_win(task_graph):
+def test_todo_high_prioritys_win(task_project):
     """High prioritys are scheduled before low prioritys"""
-    todo = [n.name for n in task_graph.todo()]
+    todo = [n.name for n in task_project.todo()]
     assert todo.index('task 1') < todo.index('task 2')
     assert todo.index('task 1') < todo.index('task 3')
     assert todo.index('task 1.3') < todo.index('task 1.1')
 
 
-def test_todo_blocking_tasks_win(task_graph):
+def test_todo_blocking_tasks_win(task_project):
     """Blocking tasks are scheduled before blocked tasks"""
-    todo = [n.name for n in task_graph.todo()]
+    todo = [n.name for n in task_project.todo()]
     assert todo.index('task 2.2') < todo.index('task 3.2')
     assert todo.index('task 2.2') < todo.index('task 1.2')
     assert todo.index('task 1.1') < todo.index('task 1.2')
 
 
-def test_postorder_default_prioritys_ignored(task_graph):
+def test_postorder_default_prioritys_ignored(task_project):
     """Post-order traversal ignores task prioritys by default"""
-    po = [n.name for _, n in task_graph._postorder()]
+    po = [n.name for _, n in task_project._postorder()]
     assert po.index('task 1.1') < po.index('task 1.3')
 
 
@@ -80,31 +80,31 @@ def test_task_append_task():
     assert rootTask[1] is subTask2
 
 
-def test_task_append(graph):
-    thing1 = graph.append('1st thing')
-    thing2 = graph.append('2nd thing')
-    thing3 = graph.append('3rd thing')
+def test_task_append(project):
+    thing1 = project.append('1st thing')
+    thing2 = project.append('2nd thing')
+    thing3 = project.append('3rd thing')
 
-    assert thing1 is graph[0]
-    assert thing2 is graph[1]
-    assert thing3 is graph[2]
+    assert thing1 is project[0]
+    assert thing2 is project[1]
+    assert thing3 is project[2]
 
     assert thing1.name == '1st thing'
     assert thing2.name == '2nd thing'
     assert thing3.name == '3rd thing'
 
 
-def test_task_pop(graph):
-    assert graph[2].name == '3rd thing'
-    graph.pop(2)
+def test_task_pop(project):
+    assert project[2].name == '3rd thing'
+    project.pop(2)
     with pytest.raises(IndexError) as info:
-        thing3 = graph[2]
+        thing3 = project[2]
         assert "" in str(info.value)
 
 
-def test_task_pop_fail1(graph):
+def test_task_pop_fail1(project):
     with pytest.raises(IndexError):
-        graph.pop(20000)
+        project.pop(20000)
 
 
 def test_task_append_TypeError():
@@ -114,36 +114,36 @@ def test_task_append_TypeError():
         assert "" in str(info.value)
 
 
-def test_blockedby(graph):
-    thing1 = graph[0]
+def test_blockedby(project):
+    thing1 = project[0]
     thing1_1 = thing1.append('thing within a thing')
     thing1_2 = thing1.append('thing blocking a thing')
     thing1_1.blockedby(thing1_2)
     assert thing1_1.blockers[0].name == 'thing blocking a thing'
 
 
-def test_blocking(graph):
-    thing2 = graph[1]
+def test_blocking(project):
+    thing2 = project[1]
     thing2_1 = thing2.append('another thing within a thing')
     thing2_2 = thing2.append('another thing blocking a thing')
     thing2_2.blocking(thing2_1)
     assert thing2_1.blockers[0].name == 'another thing blocking a thing'
 
 
-def test_repr(graph):
-    assert graph.name == 'learn all the things'
+def test_repr(project):
+    assert project.name == 'learn all the things'
 
-    thing1 = graph[0]
-    thing2 = graph[1]
+    thing1 = project[0]
+    thing2 = project[1]
 
     with pytest.raises(IndexError) as info:
-        thing3 = graph[2]
+        thing3 = project[2]
         assert "" in str(info.value)
 
     assert thing1.name == '1st thing'
     assert thing2.name == '2nd thing'
 
-    assert str(graph) == "".join([
+    assert str(project) == "".join([
         "learn all the things:\n",
         "- 1st thing:\n",
         "  - thing within a thing\n",
@@ -154,14 +154,14 @@ def test_repr(graph):
     ])
 
 
-def test_deep_repr(graph):
+def test_deep_repr(project):
 
-    thing2_1 = graph[1][0]
+    thing2_1 = project[1][0]
     assert thing2_1.name == 'another thing within a thing'
 
     thing2_1.append('super deep thing')
 
-    assert str(graph) == "".join([
+    assert str(project) == "".join([
         "learn all the things:\n",
         "- 1st thing:\n",
         "  - thing within a thing\n",
@@ -193,24 +193,24 @@ def test_name_getter_setter():
     assert task.name == 'a new name'
 
 
-def test_to_yaml(graph):
-    assert graph.name == 'learn all the things'
-    assert graph[0].name == '1st thing'
-    graph.to_yaml('mindgraph.yaml')
-    graph2 = read_yaml('mindgraph.yaml')
-    test_repr(graph2)
-    assert repr(graph) == repr(graph2)
-    os.remove('mindgraph.yaml')
+def test_to_yaml(project):
+    assert project.name == 'learn all the things'
+    assert project[0].name == '1st thing'
+    project.to_yaml('project.yaml')
+    project2 = read_yaml('project.yaml')
+    test_repr(project2)
+    assert repr(project) == repr(project2)
+    os.remove('project.yaml')
 
 
 def test_to_yaml_TypeError():
-    not_a_graph = yaml.dump("not a graph")
-    with open('not_a_graph.yaml', 'w') as f:
-        f.write(not_a_graph)
+    not_a_project = yaml.dump("not a project")
+    with open('not_a_project.yaml', 'w') as f:
+        f.write(not_a_project)
     with pytest.raises(TypeError) as info:
-        read_yaml('not_a_graph.yaml')
+        read_yaml('not_a_project.yaml')
         assert "" in str(info.value)
-    os.remove('not_a_graph.yaml')
+    os.remove('not_a_project.yaml')
 
 
 def test_parser():
