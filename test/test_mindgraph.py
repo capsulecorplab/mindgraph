@@ -12,24 +12,24 @@ from mindgraph import *
 
 @pytest.fixture(scope="module")
 def graph():
-    graph = Graph('learn all the things')
+    graph = Project('learn all the things')
     return graph
 
 
 @pytest.fixture
 def task_graph():
     # setup example graph from issue #14
-    g = Graph('build a thing')
+    g = Project('build a thing')
 
     t1 = g.append('task 1')
-    t1.weight = 3
+    t1.priority = 3
     t11 = t1.append('task 1.1')
     t12 = t1.append('task 1.2')
     t13 = t1.append('task 1.3')
-    t13.weight = 3
+    t13.priority = 3
 
     t2 = g.append('task 2')
-    t2.weight = 2
+    t2.priority = 2
     t21 = t2.append('task 2.1')
     t22 = t2.append('task 2.2')
     t221 = t22.append('task 2.2.1')
@@ -39,13 +39,13 @@ def task_graph():
     t31 = t3.append('task 3.1')
     t32 = t3.append('task 3.2')
 
-    t32.threads.append(t22)
-    t12.threads.append(t22)
+    t32.subtasks.append(t22)
+    t12.subtasks.append(t22)
     return g
 
 
-def test_todo_high_weights_win(task_graph):
-    """High weights are scheduled before low weights"""
+def test_todo_high_prioritys_win(task_graph):
+    """High prioritys are scheduled before low prioritys"""
     todo = [n.name for n in task_graph.todo()]
     assert todo.index('task 1') < todo.index('task 2')
     assert todo.index('task 1') < todo.index('task 3')
@@ -60,24 +60,24 @@ def test_todo_blocking_tasks_win(task_graph):
     assert todo.index('task 1.1') < todo.index('task 1.2')
 
 
-def test_postorder_default_weights_ignored(task_graph):
-    """Post-order traversal ignores node weights by default"""
+def test_postorder_default_prioritys_ignored(task_graph):
+    """Post-order traversal ignores node prioritys by default"""
     po = [n.name for _, n in task_graph._postorder()]
     assert po.index('task 1.1') < po.index('task 1.3')
 
 
 def test_node_init_typeerror():
     with pytest.raises(TypeError) as info:
-        node = Node(47)
+        node = Task(47)
         assert "" in str(info.value)
 
 
 def test_node_append_node():
-    rootNode = Node('root node')
-    subNode1 = rootNode.append(Node('sub node'))
-    subNode2 = rootNode.append(Node('sub node 2'))
-    assert rootNode[0] is subNode1
-    assert rootNode[1] is subNode2
+    rootTask = Task('root node')
+    subTask1 = rootTask.append(Task('sub node'))
+    subTask2 = rootTask.append(Task('sub node 2'))
+    assert rootTask[0] is subTask1
+    assert rootTask[1] is subTask2
 
 
 def test_node_append(graph):
@@ -109,7 +109,7 @@ def test_node_pop_fail1(graph):
 
 def test_node_append_TypeError():
     with pytest.raises(TypeError) as info:
-        node = Node('mynode')
+        node = Task('mynode')
         node.append(47)
         assert "" in str(info.value)
 
@@ -119,7 +119,7 @@ def test_blockedby(graph):
     thing1_1 = thing1.append('thing within a thing')
     thing1_2 = thing1.append('thing blocking a thing')
     thing1_1.blockedby(thing1_2)
-    assert thing1_1.dependencies[0].name == 'thing blocking a thing'
+    assert thing1_1.blockers[0].name == 'thing blocking a thing'
 
 
 def test_blocking(graph):
@@ -127,7 +127,7 @@ def test_blocking(graph):
     thing2_1 = thing2.append('another thing within a thing')
     thing2_2 = thing2.append('another thing blocking a thing')
     thing2_2.blocking(thing2_1)
-    assert thing2_1.dependencies[0].name == 'another thing blocking a thing'
+    assert thing2_1.blockers[0].name == 'another thing blocking a thing'
 
 
 def test_repr(graph):
@@ -175,17 +175,17 @@ def test_deep_repr(graph):
     thing2_1.pop(0)
 
 
-def test_weight_getter_setter():
-    node = Node('myNode')
-    default_weight = node.weight
-    node.weight = 5
+def test_priority_getter_setter():
+    node = Task('myTask')
+    default_priority = node.priority
+    node.priority = 5
 
-    assert default_weight == 1
-    assert node.weight == 5
+    assert default_priority == 1
+    assert node.priority == 5
 
 
 def test_name_getter_setter():
-    node = Node()
+    node = Task()
     default_name = node.name
     node.name = 'a new name'
 
