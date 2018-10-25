@@ -12,14 +12,14 @@ from mindgraph import *
 
 @pytest.fixture(scope="module")
 def graph():
-    graph = Project('learn all the things')
+    graph = project('learn all the things')
     return graph
 
 
 @pytest.fixture
 def task_graph():
     # setup example graph from issue #14
-    g = Project('build a thing')
+    g = project('build a thing')
 
     t1 = g.append('task 1')
     t1.priority = 3
