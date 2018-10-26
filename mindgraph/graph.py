@@ -69,21 +69,21 @@ class Task(object):
     def _postorder(self,
                    depth: int = 0,
                    visited: Set["Task"] = None,
-                   Task_key: Callable[["Task"], Any]=None,
+                   taskkey: Callable[["Task"], Any]=None,
                    ) -> Generator[Tuple[int, "Task"], None, Set["Task"]]:
         """Post-order traversal of Project rooted at Task"""
         if visited is None:
             visited = set()
 
         children = self._subtasks
-        if Task_key is not None:
-            children = sorted(self._subtasks, key=Task_key)
+        if taskkey is not None:
+            children = sorted(self._subtasks, key=taskkey)
 
         for child in children:
             if child not in visited:
                 visited = yield from child._postorder(depth+1,
                                                       visited,
-                                                      Task_key)
+                                                      taskkey)
 
         yield (depth, self)
         visited.add(self)
@@ -96,9 +96,9 @@ class Task(object):
         Tasks are scheduled by priority and to resolve blocking tasks
         """
         # sorts by priority (2 before 1), then alphabetical
-        def Task_key(Task):
+        def taskkey(Task):
             return (-Task.priority, Task.name)
-        return (x[1] for x in self._postorder(Task_key=Task_key))
+        return (x[1] for x in self._postorder(taskkey=taskkey))
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
