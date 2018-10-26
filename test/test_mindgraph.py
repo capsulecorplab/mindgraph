@@ -44,8 +44,8 @@ def task_project():
     return g
 
 
-def test_todo_high_prioritys_win(task_project):
-    """High prioritys are scheduled before low prioritys"""
+def test_todo_high_priorities_win(task_project):
+    """High priorities are scheduled before low priorities"""
     todo = [n.name for n in task_project.todo()]
     assert todo.index('task 1') < todo.index('task 2')
     assert todo.index('task 1') < todo.index('task 3')
@@ -60,8 +60,8 @@ def test_todo_blocking_tasks_win(task_project):
     assert todo.index('task 1.1') < todo.index('task 1.2')
 
 
-def test_postorder_default_prioritys_ignored(task_project):
-    """Post-order traversal ignores task prioritys by default"""
+def test_postorder_default_priorities_ignored(task_project):
+    """Post-order traversal ignores task priorities by default"""
     po = [n.name for _, n in task_project._postorder()]
     assert po.index('task 1.1') < po.index('task 1.3')
 
