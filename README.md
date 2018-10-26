@@ -20,14 +20,14 @@ $ pip install git+https://github.com/capsulecorplab/mindgraph.git
 ```
 >>> import mindgraph as mg
 
->>> graph = mg.Graph('learn all the things')
->>> thing1 = graph.append('1st thing')
->>> thing2 = graph.append('2nd thing')
->>> thing3 = graph.append('3rd thing')
+>>> project = mg.Project('learn all the things')
+>>> thing1 = project.append('1st thing')
+>>> thing2 = project.append('2nd thing')
+>>> thing3 = project.append('3rd thing')
 
->>> graph.remove(2)
+>>> project.remove(2)
 
->>> thing1 = graph[0]
+>>> thing1 = project[0]
 >>> thing1_1 = thing1.append('thing within a thing')
 >>> thing1_2 = thing1.append('thing blocking a thing')
 >>> thing1_1.blockedby(thing1_2)
@@ -36,7 +36,7 @@ $ pip install git+https://github.com/capsulecorplab/mindgraph.git
 >>> thing2_2 = thing2.append('another thing blocking a thing')
 >>> thing2_2.blocking(thing2_1)
 
->>> print(graph)
+>>> print(project)
 learn all the things:
 - 1st thing:
   - thing within a thing
@@ -46,11 +46,11 @@ learn all the things:
   - another thing blocking a thing
 ```
 
-`Graph` objects can be exported to, and imported from, a yaml file for storage:
+Projects can be exported to, or imported from, a yaml file for external storage:
 
 ```
->>> graph.to_yaml('mygraph.yaml')
->>> graph2 = mg.read_yaml('mygraph.yaml')
+>>> project.to_yaml('myproject.yaml')
+>>> revivedproject = mg.read_yaml('myproject.yaml')
 ```
 
 ## Contribute
