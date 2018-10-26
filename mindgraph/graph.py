@@ -50,13 +50,10 @@ class Task(object):
         return self._subtasks[key]
 
     def __repr__(self) -> str:
-        return '\n'.join(self.format_tree())
+        return '\n'.join(self._format_tree())
 
-    def format_tree(self: "Task", depth: int = 0) -> Iterator[str]:
-        """Format Task and dependents in tree format, emitting lines
-
-        Assumes no cycles in Project
-        """
+    def _format_tree(self: "Task", depth: int = 0) -> Iterator[str]:
+        """Generates task and subtasks into a string formatted tree"""
         indent = '    ' * depth
         bullet = '- ' if depth != 0 else ''
         suffix = ':' if self.subtasks else ''
@@ -64,7 +61,7 @@ class Task(object):
 
         yield line
         for n in self.subtasks:
-            yield from n.format_tree(depth+1)
+            yield from n._format_tree(depth+1)
 
     def _postorder(self,
                    depth: int = 0,
