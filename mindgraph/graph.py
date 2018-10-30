@@ -2,11 +2,6 @@
 from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
                     Tuple)
 from yaml import dump, load
-from bisect import bisect_left
-
-
-
-
 
 class Node(object):
     """node class"""
