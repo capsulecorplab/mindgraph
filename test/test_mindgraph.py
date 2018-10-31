@@ -80,18 +80,6 @@ def test_task_append_task():
     assert rootTask[1] is subTask2
 
 
-<<<<<<< HEAD
-def test_node_append(graph):
-    thing1 = graph.append('1st thing')
-    thing2 = graph.append('2nd thing')
-    thing3 = graph.append('3rd thing')
-    thing4 = graph.append('4th thing')
-
-    assert thing1 is graph[0]
-    assert thing2 is graph[1]
-    assert thing3 is graph[2]
-    assert thing4 is graph[3]
-=======
 def test_task_append(project):
     thing1 = project.append('1st thing')
     thing2 = project.append('2nd thing')
@@ -100,26 +88,12 @@ def test_task_append(project):
     assert thing1 is project[0]
     assert thing2 is project[1]
     assert thing3 is project[2]
->>>>>>> upstream/master
 
     assert thing1.name == '1st thing'
     assert thing2.name == '2nd thing'
     assert thing3.name == '3rd thing'
-    assert thing4.name == '4th thing'
 
 
-<<<<<<< HEAD
-def test_node_pop(graph):
-    assert graph[3].name == '4th thing'
-    graph.pop(2)
-    with pytest.raises(IndexError) as info:
-        thing3 = graph[3]
-        assert "" in str(info.value)
-
-
-
-def test_node_pop_fail1(graph):
-=======
 def test_task_pop(project):
     assert project[2].name == '3rd thing'
     project.pop(2)
@@ -129,7 +103,6 @@ def test_task_pop(project):
 
 
 def test_task_pop_fail1(project):
->>>>>>> upstream/master
     with pytest.raises(IndexError):
         project.pop(20000)
 
@@ -149,16 +122,6 @@ def test_blockedby(project):
     assert thing1_1.blockers[0].name == 'thing blocking a thing'
 
 
-<<<<<<< HEAD
-def test_blockedby_fail_by_type(graph):
-    thing3 = graph[0]
-    with pytest.raises(TypeError):
-        thing3.blockedby(123)
-
-
-def test_blocking(graph):
-    thing2 = graph[1]
-=======
 def test_blockedby_TypeError():
     with pytest.raises(TypeError):
         task = Task('mytask')
@@ -167,7 +130,6 @@ def test_blockedby_TypeError():
 
 def test_blocking(project):
     thing2 = project[1]
->>>>>>> upstream/master
     thing2_1 = thing2.append('another thing within a thing')
     thing2_2 = thing2.append('another thing blocking a thing')
     thing2_2.blocking(thing2_1)
@@ -180,29 +142,14 @@ def test_blocking_TypeError():
         task.blocking(47)
 
 
-<<<<<<< HEAD
-def test_blockeding_fail_by_type(graph):
-    thing3 = graph[0]
-    with pytest.raises(TypeError):
-        thing3.blocking(123)
-
-
-def test_repr(graph):
-    assert graph.name == 'learn all the things'
-=======
 def test_repr(project):
     assert project.name == 'learn all the things'
->>>>>>> upstream/master
 
     thing1 = project[0]
     thing2 = project[1]
 
     with pytest.raises(IndexError) as info:
-<<<<<<< HEAD
-        thing4 = graph[10]
-=======
         thing3 = project[2]
->>>>>>> upstream/master
         assert "" in str(info.value)
 
     assert thing1.name == '1st thing'
@@ -216,7 +163,6 @@ def test_repr(project):
         "- 2nd thing:\n"
         "  - another thing within a thing\n",
         "  - another thing blocking a thing\n",
-        "- 4th thing\n"
     ])
 
 
@@ -279,17 +225,6 @@ def test_to_yaml_TypeError():
     os.remove('not_a_project.yaml')
 
 
-def test_node_pop_by_name(graph):
-    graph.append('thingy')
-    graph.pop('thingy')
-    assert len(graph.threads) == 3
-
-
-def test_node_pop_by_name_fail(graph):
-    with pytest.raises(NameError):
-        graph.pop('thingy')
-
-
 def test_parser():
     file_list = [choice(string.ascii_letters) for _ in range(5)]
     parser = arg_parser(["-f"]+file_list)
@@ -319,4 +254,4 @@ def test_main(mock_read_yaml, mock_arg_parse, mock_file):
 
 if __name__ == '__main__':
     print(__doc__)
-    pytest.main(args=['-v'])
+pytest.main(args=['-v'])

@@ -24,8 +24,8 @@ class Task(object):
         return newtask
 
     def _linear_search(self, name: str) -> int:
-        """ find a node index by name in self._threads """
-        for i, node in enumerate(self._threads):
+        """ find a node index by name in self._subtasks """
+        for i, node in enumerate(self._subtasks):
             if node.name == name:
                 return i
         return -1
@@ -33,13 +33,13 @@ class Task(object):
     def pop(self, item: Union[int, str, None] = None) -> "Node":
         """ Pops the Node from threads[index] """
         if isinstance(item, int):
-            return self._threads.pop(item)
+            return self._subtasks.pop(item)
         if item is None:
-            return self._threads.pop()
+            return self._subtasks.pop()
         index = self._linear_search(item)
         if index == -1:
             raise NameError
-        return self._threads.pop(index)
+        return self._subtasks.pop(index)
 
     def blockedby(self, task: "Task") -> None:
         """ Adds a task to the subtasks list """
@@ -112,7 +112,7 @@ class Task(object):
         return dump(load(str(self.__repr__())), default_flow_style=False)
 
     def __len__(self) -> int:
-        return len(self._threads)
+        return len(self._subtasks)
 
     @property
     def blockers(self) -> List["Task"]:
