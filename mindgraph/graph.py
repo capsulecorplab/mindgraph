@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
-                    Tuple)
+from typing import (Any, Callable, Generator, Iterator, List, Union, Set, Tuple)
 from yaml import dump, load
 
 class Node(object):
@@ -32,11 +31,11 @@ class Node(object):
                 return i
         return -1
 
-    def pop(self, item = None) -> "Node":
+    def pop(self, item: Union[int, str, None] = None) -> "Node":
         """ Pops the Node from threads[index] """
-        if type(item) == int:
+        if isinstance(item, int):
             return self._threads.pop(item)
-        if item == None:
+        if item is None:
             return self._threads.pop()
         index = self._linear_search(item)
         if index == -1:
