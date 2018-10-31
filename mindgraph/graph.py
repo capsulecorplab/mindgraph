@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from typing import (Any, Callable, Generator, Iterator, List, Union, Set, Tuple)
+from typing import (Any, Callable, Generator, Iterator, List, Union, Set, 
+                    Tuple)
 from yaml import dump, load
 
 class Task(object):
@@ -30,7 +31,7 @@ class Task(object):
                 return i
         return -1
 
-    def pop(self, item: Union[int, str, None] = None) -> "Task":
+    def pop(self, item: Union[int, str, None]=None) -> "Task":
         """ Pops the Task from subtasks[index] """
         if isinstance(item, int):
             return self._subtasks.pop(item)
