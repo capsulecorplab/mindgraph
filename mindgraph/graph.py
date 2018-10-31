@@ -30,8 +30,8 @@ class Task(object):
                 return i
         return -1
 
-    def pop(self, item: Union[int, str, None] = None) -> "Node":
-        """ Pops the Node from threads[index] """
+    def pop(self, item: Union[int, str, None] = None) -> "Task":
+        """ Pops the Task from subtasks[index] """
         if isinstance(item, int):
             return self._subtasks.pop(item)
         if item is None:
