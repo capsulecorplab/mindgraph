@@ -11,25 +11,25 @@ from mindgraph import *
 
 
 @pytest.fixture(scope="module")
-def graph():
-    graph = Graph('learn all the things')
-    return graph
+def project():
+    project = Project('learn all the things')
+    return project
 
 
 @pytest.fixture
-def task_graph():
-    # setup example graph from issue #14
-    g = Graph('build a thing')
+def task_project():
+    # setup example project from issue #14
+    g = Project('build a thing')
 
     t1 = g.append('task 1')
-    t1.weight = 3
+    t1.priority = 3
     t11 = t1.append('task 1.1')
     t12 = t1.append('task 1.2')
     t13 = t1.append('task 1.3')
-    t13.weight = 3
+    t13.priority = 3
 
     t2 = g.append('task 2')
-    t2.weight = 2
+    t2.priority = 2
     t21 = t2.append('task 2.1')
     t22 = t2.append('task 2.2')
     t221 = t22.append('task 2.2.1')
@@ -39,47 +39,48 @@ def task_graph():
     t31 = t3.append('task 3.1')
     t32 = t3.append('task 3.2')
 
-    t32.threads.append(t22)
-    t12.threads.append(t22)
+    t32.subtasks.append(t22)
+    t12.subtasks.append(t22)
     return g
 
 
-def test_todo_high_weights_win(task_graph):
-    """High weights are scheduled before low weights"""
-    todo = [n.name for n in task_graph.todo()]
+def test_todo_high_priorities_win(task_project):
+    """High priorities are scheduled before low priorities"""
+    todo = [n.name for n in task_project.todo()]
     assert todo.index('task 1') < todo.index('task 2')
     assert todo.index('task 1') < todo.index('task 3')
     assert todo.index('task 1.3') < todo.index('task 1.1')
 
 
-def test_todo_blocking_tasks_win(task_graph):
+def test_todo_blocking_tasks_win(task_project):
     """Blocking tasks are scheduled before blocked tasks"""
-    todo = [n.name for n in task_graph.todo()]
+    todo = [n.name for n in task_project.todo()]
     assert todo.index('task 2.2') < todo.index('task 3.2')
     assert todo.index('task 2.2') < todo.index('task 1.2')
     assert todo.index('task 1.1') < todo.index('task 1.2')
 
 
-def test_postorder_default_weights_ignored(task_graph):
-    """Post-order traversal ignores node weights by default"""
-    po = [n.name for _, n in task_graph._postorder()]
+def test_postorder_default_priorities_ignored(task_project):
+    """Post-order traversal ignores task priorities by default"""
+    po = [n.name for _, n in task_project._postorder()]
     assert po.index('task 1.1') < po.index('task 1.3')
 
 
-def test_node_init_typeerror():
+def test_task_init_typeerror():
     with pytest.raises(TypeError) as info:
-        node = Node(47)
+        task = Task(47)
         assert "" in str(info.value)
 
 
-def test_node_append_node():
-    rootNode = Node('root node')
-    subNode1 = rootNode.append(Node('sub node'))
-    subNode2 = rootNode.append(Node('sub node 2'))
-    assert rootNode[0] is subNode1
-    assert rootNode[1] is subNode2
+def test_task_append_task():
+    rootTask = Task('root task')
+    subTask1 = rootTask.append(Task('sub task'))
+    subTask2 = rootTask.append(Task('sub task 2'))
+    assert rootTask[0] is subTask1
+    assert rootTask[1] is subTask2
 
 
+<<<<<<< HEAD
 def test_node_append(graph):
     thing1 = graph.append('1st thing')
     thing2 = graph.append('2nd thing')
@@ -90,6 +91,16 @@ def test_node_append(graph):
     assert thing2 is graph[1]
     assert thing3 is graph[2]
     assert thing4 is graph[3]
+=======
+def test_task_append(project):
+    thing1 = project.append('1st thing')
+    thing2 = project.append('2nd thing')
+    thing3 = project.append('3rd thing')
+
+    assert thing1 is project[0]
+    assert thing2 is project[1]
+    assert thing3 is project[2]
+>>>>>>> upstream/master
 
     assert thing1.name == '1st thing'
     assert thing2.name == '2nd thing'
@@ -97,6 +108,7 @@ def test_node_append(graph):
     assert thing4.name == '4th thing'
 
 
+<<<<<<< HEAD
 def test_node_pop(graph):
     assert graph[3].name == '4th thing'
     graph.pop(2)
@@ -107,25 +119,37 @@ def test_node_pop(graph):
 
 
 def test_node_pop_fail1(graph):
-    with pytest.raises(IndexError):
-        graph.pop(20000)
-
-
-def test_node_append_TypeError():
-    with pytest.raises(TypeError) as info:
-        node = Node('mynode')
-        node.append(47)
+=======
+def test_task_pop(project):
+    assert project[2].name == '3rd thing'
+    project.pop(2)
+    with pytest.raises(IndexError) as info:
+        thing3 = project[2]
         assert "" in str(info.value)
 
 
-def test_blockedby(graph):
-    thing1 = graph[0]
+def test_task_pop_fail1(project):
+>>>>>>> upstream/master
+    with pytest.raises(IndexError):
+        project.pop(20000)
+
+
+def test_task_append_TypeError():
+    with pytest.raises(TypeError) as info:
+        task = Task('mytask')
+        task.append(47)
+        assert "" in str(info.value)
+
+
+def test_blockedby(project):
+    thing1 = project[0]
     thing1_1 = thing1.append('thing within a thing')
     thing1_2 = thing1.append('thing blocking a thing')
     thing1_1.blockedby(thing1_2)
-    assert thing1_1.dependencies[0].name == 'thing blocking a thing'
+    assert thing1_1.blockers[0].name == 'thing blocking a thing'
 
 
+<<<<<<< HEAD
 def test_blockedby_fail_by_type(graph):
     thing3 = graph[0]
     with pytest.raises(TypeError):
@@ -134,12 +158,29 @@ def test_blockedby_fail_by_type(graph):
 
 def test_blocking(graph):
     thing2 = graph[1]
+=======
+def test_blockedby_TypeError():
+    with pytest.raises(TypeError):
+        task = Task('mytask')
+        task.blockedby(47)
+
+
+def test_blocking(project):
+    thing2 = project[1]
+>>>>>>> upstream/master
     thing2_1 = thing2.append('another thing within a thing')
     thing2_2 = thing2.append('another thing blocking a thing')
     thing2_2.blocking(thing2_1)
-    assert thing2_1.dependencies[0].name == 'another thing blocking a thing'
+    assert thing2_1.blockers[0].name == 'another thing blocking a thing'
 
 
+def test_blocking_TypeError():
+    with pytest.raises(TypeError):
+        task = Task('mytask')
+        task.blocking(47)
+
+
+<<<<<<< HEAD
 def test_blockeding_fail_by_type(graph):
     thing3 = graph[0]
     with pytest.raises(TypeError):
@@ -148,18 +189,26 @@ def test_blockeding_fail_by_type(graph):
 
 def test_repr(graph):
     assert graph.name == 'learn all the things'
+=======
+def test_repr(project):
+    assert project.name == 'learn all the things'
+>>>>>>> upstream/master
 
-    thing1 = graph[0]
-    thing2 = graph[1]
+    thing1 = project[0]
+    thing2 = project[1]
 
     with pytest.raises(IndexError) as info:
+<<<<<<< HEAD
         thing4 = graph[10]
+=======
+        thing3 = project[2]
+>>>>>>> upstream/master
         assert "" in str(info.value)
 
     assert thing1.name == '1st thing'
     assert thing2.name == '2nd thing'
 
-    assert str(graph) == "".join([
+    assert str(project) == "".join([
         "learn all the things:\n",
         "- 1st thing:\n",
         "  - thing within a thing\n",
@@ -171,14 +220,14 @@ def test_repr(graph):
     ])
 
 
-def test_deep_repr(graph):
+def test_deep_repr(project):
 
-    thing2_1 = graph[1][0]
+    thing2_1 = project[1][0]
     assert thing2_1.name == 'another thing within a thing'
 
     thing2_1.append('super deep thing')
 
-    assert str(graph) == "".join([
+    assert str(project) == "".join([
         "learn all the things:\n",
         "- 1st thing:\n",
         "  - thing within a thing\n",
@@ -192,42 +241,42 @@ def test_deep_repr(graph):
     thing2_1.pop(0)
 
 
-def test_weight_getter_setter():
-    node = Node('myNode')
-    default_weight = node.weight
-    node.weight = 5
+def test_priority_getter_setter():
+    task = Task('myTask')
+    default_priority = task.priority
+    task.priority = 5
 
-    assert default_weight == 1
-    assert node.weight == 5
+    assert default_priority == 1
+    assert task.priority == 5
 
 
 def test_name_getter_setter():
-    node = Node()
-    default_name = node.name
-    node.name = 'a new name'
+    task = Task()
+    default_name = task.name
+    task.name = 'a new name'
 
     assert default_name == ''
-    assert node.name == 'a new name'
+    assert task.name == 'a new name'
 
 
-def test_to_yaml(graph):
-    assert graph.name == 'learn all the things'
-    assert graph[0].name == '1st thing'
-    graph.to_yaml('mindgraph.yaml')
-    graph2 = read_yaml('mindgraph.yaml')
-    test_repr(graph2)
-    assert repr(graph) == repr(graph2)
-    os.remove('mindgraph.yaml')
+def test_to_yaml(project):
+    assert project.name == 'learn all the things'
+    assert project[0].name == '1st thing'
+    project.to_yaml('project.yaml')
+    project2 = read_yaml('project.yaml')
+    test_repr(project2)
+    assert repr(project) == repr(project2)
+    os.remove('project.yaml')
 
 
 def test_to_yaml_TypeError():
-    not_a_graph = yaml.dump("not a graph")
-    with open('not_a_graph.yaml', 'w') as f:
-        f.write(not_a_graph)
+    not_a_project = yaml.dump("not a project")
+    with open('not_a_project.yaml', 'w') as f:
+        f.write(not_a_project)
     with pytest.raises(TypeError) as info:
-        read_yaml('not_a_graph.yaml')
+        read_yaml('not_a_project.yaml')
         assert "" in str(info.value)
-    os.remove('not_a_graph.yaml')
+    os.remove('not_a_project.yaml')
 
 
 def test_node_pop_by_name(graph):

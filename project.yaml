@@ -1,0 +1,47 @@
+!!python/object:mindgraph.graph.Task
+_blockers: []
+_name: learn all the things
+_priority: 1
+_subtasks:
+- !!python/object:mindgraph.graph.Task
+  _blockers: []
+  _name: 1st thing
+  _priority: 1
+  _subtasks:
+  - !!python/object:mindgraph.graph.Task
+    _blockers:
+    - &id001 !!python/object:mindgraph.graph.Task
+      _blockers: []
+      _name: thing blocking a thing
+      _priority: 1
+      _subtasks: []
+    _name: thing within a thing
+    _priority: 1
+    _subtasks: []
+  - *id001
+- !!python/object:mindgraph.graph.Task
+  _blockers: []
+  _name: 2nd thing
+  _priority: 1
+  _subtasks:
+  - !!python/object:mindgraph.graph.Task
+    _blockers:
+    - &id002 !!python/object:mindgraph.graph.Task
+      _blockers: []
+      _name: another thing blocking a thing
+      _priority: 1
+      _subtasks: []
+    _name: another thing within a thing
+    _priority: 1
+    _subtasks:
+    - !!python/object:mindgraph.graph.Task
+      _blockers: []
+      _name: super deep thing
+      _priority: 1
+      _subtasks: []
+  - *id002
+- !!python/object:mindgraph.graph.Task
+  _blockers: []
+  _name: 3rd thing
+  _priority: 1
+  _subtasks: []

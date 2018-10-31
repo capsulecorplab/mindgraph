@@ -2,27 +2,26 @@
 from typing import (Any, Callable, Generator, Iterator, List, Union, Set, Tuple)
 from yaml import dump, load
 
-class Node(object):
-    """node class"""
-
-    def __init__(self, name: str = '', weight: int = 1) -> None:
-        self._dependencies = list()  # type: List[Node]
-        self._threads = list()  # type: List[Node]
+class Task(object):
+    """Task class"""
+    def __init__(self, name: str = '', priority: int = 1) -> None:
+        self._blockers = list()  # type: List[Task]
+        self._subtasks = list()  # type: List[Task]
         self._name = ''  # type: str
-        self._weight = weight  # type: int
+        self._priority = priority  # type: int
         if type(name) is str:
             self._name = name
         else:
             raise TypeError
 
-    def append(self, newnode) -> "Node":
-        """ Creates a new Node and appends it to threads """
-        if type(newnode) is str:
-            newnode = Node(newnode)
-        elif type(newnode) is not Node:
+    def append(self, newtask) -> "Task":
+        """ Creates a new Task and appends it to subtasks """
+        if type(newtask) is str:
+            newtask = Task(newtask)
+        elif type(newtask) is not Task:
             raise TypeError
-        self._threads.append(newnode)
-        return newnode
+        self._subtasks.append(newtask)
+        return newtask
 
     def _linear_search(self, name: str) -> int:
         """ find a node index by name in self._threads """
@@ -42,75 +41,72 @@ class Node(object):
             raise NameError
         return self._threads.pop(index)
 
-    def blockedby(self, node: "Node") -> None:
-        """ Adds a Node to the dependenceis list """
-        if type(node) is Node:
-            self._dependencies.append(node)
+    def blockedby(self, task: "Task") -> None:
+        """ Adds a task to the subtasks list """
+        if type(task) is Task:
+            self._blockers.append(task)
             return None
         else:
             raise TypeError
 
-    def blocking(self, node: "Node") -> None:
-        """ Adds this Node to another node's dependencies list """
-        if type(node) is Node:
-            node._dependencies.append(self)
+    def blocking(self, task: "Task") -> None:
+        """ Adds this task to another task's blockers list """
+        if type(task) is Task:
+            task._blockers.append(self)
             return None
         else:
             raise TypeError
 
-    def __getitem__(self, key: int) -> "Node":
-        return self._threads[key]
+    def __getitem__(self, key: int) -> "Task":
+        return self._subtasks[key]
 
     def __repr__(self) -> str:
-        return '\n'.join(self.format_tree())
+        return '\n'.join(self._format_tree())
 
-    def format_tree(self: "Node", depth: int = 0) -> Iterator[str]:
-        """Format node and dependents in tree format, emitting lines
-
-        Assumes no cycles in graph
-        """
+    def _format_tree(self: "Task", depth: int = 0) -> Iterator[str]:
+        """Generates task and subtasks into a string formatted tree"""
         indent = '    ' * depth
         bullet = '- ' if depth != 0 else ''
-        suffix = ':' if self.threads else ''
+        suffix = ':' if self.subtasks else ''
         line = '{indent}{bullet}{self.name}{suffix}'.format(**locals())
 
         yield line
-        for n in self.threads:
-            yield from n.format_tree(depth+1)
+        for n in self.subtasks:
+            yield from n._format_tree(depth+1)
 
     def _postorder(self,
                    depth: int = 0,
-                   visited: Set["Node"] = None,
-                   node_key: Callable[["Node"], Any]=None,
-                   ) -> Generator[Tuple[int, "Node"], None, Set["Node"]]:
-        """Post-order traversal of graph rooted at node"""
+                   visited: Set["Task"] = None,
+                   taskkey: Callable[["Task"], Any]=None,
+                   ) -> Generator[Tuple[int, "Task"], None, Set["Task"]]:
+        """Post-order traversal of Project rooted at Task"""
         if visited is None:
             visited = set()
 
-        children = self._threads
-        if node_key is not None:
-            children = sorted(self._threads, key=node_key)
+        children = self._subtasks
+        if taskkey is not None:
+            children = sorted(self._subtasks, key=taskkey)
 
         for child in children:
             if child not in visited:
                 visited = yield from child._postorder(depth+1,
                                                       visited,
-                                                      node_key)
+                                                      taskkey)
 
         yield (depth, self)
         visited.add(self)
 
         return visited
 
-    def todo(self) -> Iterator["Node"]:
-        """Generate nodes in todo order
+    def todo(self) -> Iterator["Task"]:
+        """Generate Tasks in todo order
 
-        Nodes are scheduled by weight and to resolve blocking tasks
+        Tasks are scheduled by priority and to resolve blocking tasks
         """
-        # sorts by weight (2 before 1), then alphabetical
-        def node_key(node):
-            return (-node.weight, node.name)
-        return (x[1] for x in self._postorder(node_key=node_key))
+        # sorts by priority (2 before 1), then alphabetical
+        def taskkey(Task):
+            return (-Task.priority, Task.name)
+        return (x[1] for x in self._postorder(taskkey=taskkey))
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
@@ -119,9 +115,9 @@ class Node(object):
         return len(self._threads)
 
     @property
-    def dependencies(self) -> List["Node"]:
-        """ dependencies getter """
-        return self._dependencies
+    def blockers(self) -> List["Task"]:
+        """ blockers getter """
+        return self._blockers
 
     @property
     def name(self) -> str:
@@ -134,38 +130,37 @@ class Node(object):
         self._name = name
 
     @property
-    def threads(self) -> List["Node"]:
-        """ threads getter """
-        return self._threads
+    def subtasks(self) -> List["Task"]:
+        """ subtasks getter """
+        return self._subtasks
 
     @property
-    def weight(self) -> int:
-        """ weight getter """
-        return self._weight
+    def priority(self) -> int:
+        """ priority getter """
+        return self._priority
 
-    @weight.setter
-    def weight(self, value: int) -> None:
-        """ weight setter """
-        self._weight = value
-
-
-class Graph(Node):
-    """A Graph model of the mind"""
-
-    def __init__(self, name=None) -> None:
-        Node.__init__(self, name)
+    @priority.setter
+    def priority(self, value: int) -> None:
+        """ priority setter """
+        self._priority = value
 
     def to_yaml(self, filename=None) -> None:
-        """ Write this Graph to a yaml file """
+        """ Write this Project to a yaml file """
         with open(filename, 'w') as f:
             f.write(dump(self))
 
 
-def read_yaml(filename: str = "") -> Graph:
-    """ Load a Graph from a yaml file """
+class Project(object):
+    """Returns a task representing the root of your project"""
+    def __new__(cls, name: str=None) -> Task:
+        return Task(name)
+
+
+def read_yaml(filename: str = "") -> Task:
+    """ Load a project from a yaml file """
     with open(filename, 'r') as f:
         rv = load(f.read())
-        if type(rv) is Graph:
+        if type(rv) is Task:
             return rv
         else:
             raise TypeError(type(rv))
