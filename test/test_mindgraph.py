@@ -1,10 +1,10 @@
 import os
-from random import choice
 import string
 from argparse import Namespace
+from random import choice
+from unittest.mock import mock_open, patch
 
 import pytest
-from unittest.mock import mock_open, patch
 import yaml
 
 from mindgraph import *
@@ -39,8 +39,8 @@ def task_project():
     t31 = t3.append('task 3.1')
     t32 = t3.append('task 3.2')
 
-    t32.subtasks.append(t22)
-    t12.subtasks.append(t22)
+    t32.blockedby(t22)
+    t12.blockedby(t22)
     return g
 
 
