@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from typing import (Any, Callable, Generator, Iterator, List, Optional, Set,
-                    Tuple)
+from typing import Any, Callable, Iterator, List, Set, Tuple
+
 from yaml import dump, load
 
 
@@ -67,25 +67,27 @@ class Task(object):
                    depth: int = 0,
                    visited: Set["Task"] = None,
                    taskkey: Callable[["Task"], Any]=None,
-                   ) -> Generator[Tuple[int, "Task"], None, Set["Task"]]:
+                   ) -> Iterator[Tuple[int, "Task"]]:
         """Post-order traversal of Project rooted at Task"""
+        from itertools import chain
+
         if visited is None:
             visited = set()
 
-        children = self._subtasks
-        if taskkey is not None:
-            children = sorted(self._subtasks, key=taskkey)
+        if taskkey is None:
+            blockers = self.blockers
+            subtasks = self.subtasks
+        else:
+            blockers = sorted(self.blockers, key=taskkey)
+            subtasks = sorted(self.subtasks, key=taskkey)
 
-        for child in children:
-            if child not in visited:
-                visited = yield from child._postorder(depth+1,
-                                                      visited,
-                                                      taskkey)
+        for node in chain(blockers, subtasks):
+            if node in visited:
+                continue
+            yield from node._postorder(depth+1, visited, taskkey)
 
         yield (depth, self)
         visited.add(self)
-
-        return visited
 
     def todo(self) -> Iterator["Task"]:
         """Generate Tasks in todo order
@@ -93,8 +95,8 @@ class Task(object):
         Tasks are scheduled by priority and to resolve blocking tasks
         """
         # sorts by priority (2 before 1), then alphabetical
-        def taskkey(Task):
-            return (-Task.priority, Task.name)
+        def taskkey(task):
+            return (-task.priority, task.name)
         return (x[1] for x in self._postorder(taskkey=taskkey))
 
     def __str__(self) -> str:
