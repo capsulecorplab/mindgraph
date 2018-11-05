@@ -140,7 +140,7 @@ class Task(object):
 
 class Project(object):
     """Returns a task representing the root of your project"""
-    def __new__(cls, name: str=None) -> Task:
+    def __new__(cls, name: str='') -> Task:
         return Task(name)
 
 
