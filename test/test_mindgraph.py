@@ -94,6 +94,10 @@ def test_task_append(project):
     assert thing3.name == '3rd thing'
 
 
+def test_dict_like_getter(project):
+    assert project['1st thing'] is project[0]
+
+
 def test_task_pop(project):
     assert project[2].name == '3rd thing'
     project.pop(2)

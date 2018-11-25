@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Any, Callable, Iterator, List, Set, Tuple
-
+from typing import Any, Callable, Iterator, List, Set, Tuple, Union
 from yaml import dump, load
 
 
@@ -46,8 +45,11 @@ class Task(object):
         else:
             raise TypeError
 
-    def __getitem__(self, key: int) -> "Task":
-        return self._subtasks[key]
+    def __getitem__(self, key: Union[int, str]) -> "Task":
+        if type(key) is str:
+            return next(filter(lambda subtask: subtask.name == key, self.subtasks))
+        elif type(key) is int:
+            return self.subtasks[key]
 
     def __repr__(self) -> str:
         return '\n'.join(self._format_tree())
