@@ -7,9 +7,14 @@ import sys
 
 def arg_parser(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--yaml-file", dest="files", nargs="+",
-                        help="one or more yaml files separated by comma",
-                        required=True)
+    parser.add_argument(
+        "-f",
+        "--yaml-file",
+        dest="files",
+        nargs="+",
+        help="one or more yaml files separated by comma",
+        required=True,
+    )
     return parser.parse_args(args)
 
 
@@ -25,13 +30,12 @@ def main():
             with open(filename, "r") as f:
                 load(f)
         except ScannerError:
-            print("ERROR: File {} is not a valid yaml."
-                  "Ignoring.".format(filename))
+            print("ERROR: File {} is not a valid yaml." "Ignoring.".format(filename))
         else:
             graph = read_yaml(filename)
             print("Graph output of {}:".format(filename))
             print(graph)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
