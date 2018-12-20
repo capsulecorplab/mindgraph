@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 from typing import (Any, Callable, Generator, Iterator, List, Union, Set, 
                     Tuple)
+
 from yaml import dump, load
 
 class Task(object):
     """Task class"""
-    def __init__(self, name: str = '', priority: int = 1) -> None:
+
+    def __init__(self, name: str = "", priority: int = 1) -> None:
         self._blockers = list()  # type: List[Task]
         self._subtasks = list()  # type: List[Task]
-        self._name = ''  # type: str
+        self._name = ""  # type: str
         self._priority = priority  # type: int
         if type(name) is str:
             self._name = name
@@ -58,46 +60,52 @@ class Task(object):
         else:
             raise TypeError
 
-    def __getitem__(self, key: int) -> "Task":
-        return self._subtasks[key]
+    def __getitem__(self, key: Union[int, str]) -> "Task":
+        if type(key) is str:
+            return next(filter(lambda subtask: subtask.name == key, self.subtasks))
+        elif type(key) is int:
+            return self.subtasks[key]
 
     def __repr__(self) -> str:
-        return '\n'.join(self._format_tree())
+        return "\n".join(self._format_tree())
 
     def _format_tree(self: "Task", depth: int = 0) -> Iterator[str]:
         """Generates task and subtasks into a string formatted tree"""
-        indent = '    ' * depth
-        bullet = '- ' if depth != 0 else ''
-        suffix = ':' if self.subtasks else ''
-        line = '{indent}{bullet}{self.name}{suffix}'.format(**locals())
+        indent = "    " * depth
+        bullet = "- " if depth != 0 else ""
+        suffix = ":" if self.subtasks else ""
+        line = "{indent}{bullet}{self.name}{suffix}".format(**locals())
 
         yield line
         for n in self.subtasks:
-            yield from n._format_tree(depth+1)
+            yield from n._format_tree(depth + 1)
 
-    def _postorder(self,
-                   depth: int = 0,
-                   visited: Set["Task"] = None,
-                   taskkey: Callable[["Task"], Any]=None,
-                   ) -> Generator[Tuple[int, "Task"], None, Set["Task"]]:
+    def _postorder(
+        self,
+        depth: int = 0,
+        visited: Set["Task"] = None,
+        taskkey: Callable[["Task"], Any] = None,
+    ) -> Iterator[Tuple[int, "Task"]]:
         """Post-order traversal of Project rooted at Task"""
+        from itertools import chain
+
         if visited is None:
             visited = set()
 
-        children = self._subtasks
-        if taskkey is not None:
-            children = sorted(self._subtasks, key=taskkey)
+        if taskkey is None:
+            blockers = self.blockers
+            subtasks = self.subtasks
+        else:
+            blockers = sorted(self.blockers, key=taskkey)
+            subtasks = sorted(self.subtasks, key=taskkey)
 
-        for child in children:
-            if child not in visited:
-                visited = yield from child._postorder(depth+1,
-                                                      visited,
-                                                      taskkey)
+        for node in chain(blockers, subtasks):
+            if node in visited:
+                continue
+            yield from node._postorder(depth + 1, visited, taskkey)
 
         yield (depth, self)
         visited.add(self)
-
-        return visited
 
     def todo(self) -> Iterator["Task"]:
         """Generate Tasks in todo order
@@ -105,8 +113,9 @@ class Task(object):
         Tasks are scheduled by priority and to resolve blocking tasks
         """
         # sorts by priority (2 before 1), then alphabetical
-        def taskkey(Task):
-            return (-Task.priority, Task.name)
+        def taskkey(task):
+            return (-task.priority, task.name)
+
         return (x[1] for x in self._postorder(taskkey=taskkey))
 
     def __str__(self) -> str:
@@ -147,19 +156,20 @@ class Task(object):
 
     def to_yaml(self, filename=None) -> None:
         """ Write this Project to a yaml file """
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             f.write(dump(self))
 
 
 class Project(object):
     """Returns a task representing the root of your project"""
-    def __new__(cls, name: str=None) -> Task:
+
+    def __new__(cls, name: str = "") -> Task:
         return Task(name)
 
 
 def read_yaml(filename: str = "") -> Task:
     """ Load a project from a yaml file """
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         rv = load(f.read())
         if type(rv) is Task:
             return rv

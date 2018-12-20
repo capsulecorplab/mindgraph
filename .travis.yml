@@ -1,22 +1,25 @@
 language: python
 python:
-  - "3.4"
-  - "3.5"
-  - "3.5-dev"  # 3.5 development branch
+  # - "3.4"
+  # - "3.5"
+  # - "3.5-dev"  # 3.5 development branch
   - "3.6"
   - "3.6-dev"  # 3.6 development branch
   # - "3.7-dev"  # 3.7 development branch
 # command to install dependencies
 install:
   - pip install --upgrade pip
+  - pip install black
   - pip install coverage
   - pip install python-coveralls
   - pip install pytest
+  - pip install pytest-black
   - pip install pytest-cov # command to run tests
-  - pip install pytest-pep8
   - pip install -r requirements.txt
-script:
+before_script:
   - python setup.py install
-  - pytest -vv --cov-report term-missing --cov=mindgraph --pep8 # or py.test for Python versions 3.5 and below
+script:
+  - pytest -vv --cov-report term-missing --cov=mindgraph --black # or py.test for Python versions 3.5 and below
+  - mypy mindgraph/
 after_success:
   - coveralls

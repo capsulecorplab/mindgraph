@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='mindgraph',
-    version='0.0.1',
-    packages=['mindgraph'],
+    name="mindgraph",
+    version="0.0.1",
+    packages=["mindgraph"],
     author="Sean Marquez",
     author_email="capsulecorplab@gmail.com",
     description="A graph data structure, for task management, in python",
@@ -13,12 +13,8 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    setup_requires=['pytest-runner'],
-    install_requires=['pyyaml'],
-    test_require=['os', 'pytest', 'pyyaml'],
-    entry_points={
-        'console_scripts': [
-            'mindgraphcli=mindgraph.mindgraph_cli:main',
-        ]
-    }
+    setup_requires=["pytest-runner"],
+    install_requires=["pyyaml"],
+    test_require=["os", "pytest", "pyyaml"],
+    entry_points={"console_scripts": ["mindgraphcli=mindgraph.mindgraph_cli:main"]},
 )
