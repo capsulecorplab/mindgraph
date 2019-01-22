@@ -1,0 +1,47 @@
+!!python/object:mindgraph.graph.Graph
+_dependencies: []
+_name: learn all the things
+_threads:
+- !!python/object:mindgraph.graph.Node
+  _dependencies: []
+  _name: 1st thing
+  _threads:
+  - !!python/object:mindgraph.graph.Node
+    _dependencies:
+    - &id001 !!python/object:mindgraph.graph.Node
+      _dependencies: []
+      _name: thing blocking a thing
+      _threads: []
+      _weight: 1
+    _name: thing within a thing
+    _threads: []
+    _weight: 1
+  - *id001
+  _weight: 1
+- !!python/object:mindgraph.graph.Node
+  _dependencies: []
+  _name: 2nd thing
+  _threads:
+  - !!python/object:mindgraph.graph.Node
+    _dependencies:
+    - &id002 !!python/object:mindgraph.graph.Node
+      _dependencies: []
+      _name: another thing blocking a thing
+      _threads: []
+      _weight: 1
+    _name: another thing within a thing
+    _threads:
+    - !!python/object:mindgraph.graph.Node
+      _dependencies: []
+      _name: super deep thing
+      _threads: []
+      _weight: 1
+    _weight: 1
+  - *id002
+  _weight: 1
+- !!python/object:mindgraph.graph.Node
+  _dependencies: []
+  _name: 4th thing
+  _threads: []
+  _weight: 1
+_weight: 1

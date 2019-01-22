@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from typing import Any, Callable, Iterator, List, Set, Tuple, Union
-from yaml import dump, load
+from typing import (Any, Callable, Generator, Iterator, List, Union, Set, 
+                    Tuple)
 
+from yaml import dump, load
 
 class Task(object):
     """Task class"""
@@ -25,8 +26,22 @@ class Task(object):
         self._subtasks.append(newtask)
         return newtask
 
-    def pop(self, index: int) -> "Task":
+    def _linear_search(self, name: str) -> int:
+        """ find a node index by name in self._subtasks """
+        for i, node in enumerate(self._subtasks):
+            if node.name == name:
+                return i
+        return -1
+
+    def pop(self, item: Union[int, str, None]=None) -> "Task":
         """ Pops the Task from subtasks[index] """
+        if isinstance(item, int):
+            return self._subtasks.pop(item)
+        if item is None:
+            return self._subtasks.pop()
+        index = self._linear_search(item)
+        if index == -1:
+            raise NameError
         return self._subtasks.pop(index)
 
     def blockedby(self, task: "Task") -> None:
@@ -105,6 +120,9 @@ class Task(object):
 
     def __str__(self) -> str:
         return dump(load(str(self.__repr__())), default_flow_style=False)
+
+    def __len__(self) -> int:
+        return len(self._subtasks)
 
     @property
     def blockers(self) -> List["Task"]:
